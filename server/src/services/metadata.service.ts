@@ -426,7 +426,7 @@ export class MetadataService {
             'base64',
           )} already exists in the repository`,
         );
-        let extraMotionAssets = await this.getArrayByChecksum(asset.ownerId, checksum, motionAsset.id);
+        let extraMotionAssets = await this.assetRepository.getArrayByChecksum(asset.ownerId, checksum, motionAsset.id);
         if (extraMotionAssets) {
           for (const to_delete of extraMotionAssets) {
             await this.jobRepository.queue({ name: JobName.ASSET_DELETION, data: { id: to_delete.id } });
