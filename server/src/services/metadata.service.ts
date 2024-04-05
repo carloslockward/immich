@@ -180,6 +180,20 @@ export class MetadataService {
 
     const [photoAsset, motionAsset] = asset.type === AssetType.IMAGE ? [asset, match] : [match, asset];
 
+    const other_matches = await this.assetRepository.findOtherLivePhotoMatches({
+      livePhotoCID: asset.exifInfo.livePhotoCID,
+      ownerId: asset.ownerId,
+      photoAssetId: photoAsset.id,
+      videoAssetId: motionAsset.id,
+      type: otherType,
+    });
+    if (other_matches){
+      for (const to_delete of other_matches) {
+        await this.jobRepository.queue({ name: JobName.ASSET_DELETION, data: { id: to_delete.id } });
+        this.logger.log(`Removed redundant motion photo video asset (${to_delete.id})`);
+      }
+    }
+
     await this.assetRepository.update({ id: photoAsset.id, livePhotoVideoId: motionAsset.id });
     await this.assetRepository.update({ id: motionAsset.id, isVisible: false });
     await this.albumRepository.removeAsset(motionAsset.id);

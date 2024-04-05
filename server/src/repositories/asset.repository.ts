@@ -22,6 +22,7 @@ import {
   MapMarkerSearchOptions,
   MetadataSearchOptions,
   MonthDay,
+  OtherLivePhotoSearchOptions,
   TimeBucketItem,
   TimeBucketOptions,
   TimeBucketSize,
@@ -275,6 +276,24 @@ export class AssetRepository implements IAssetRepository {
     return this.repository.findOne({
       where: {
         id: Not(otherAssetId),
+        ownerId,
+        type,
+        exifInfo: {
+          livePhotoCID,
+        },
+      },
+      relations: {
+        exifInfo: true,
+      },
+    });
+  }
+
+  findOtherLivePhotoMatches(options: OtherLivePhotoSearchOptions): Promise<AssetEntity[] | null> {
+    const { ownerId, photoAssetId, videoAssetId, livePhotoCID, type } = options;
+    let filter_list = [photoAssetId, videoAssetId];
+    return this.repository.find({
+      where: {
+        id: Not(In(filter_list)),
         ownerId,
         type,
         exifInfo: {

@@ -22,6 +22,14 @@ export interface LivePhotoSearchOptions {
   type: AssetType;
 }
 
+export interface OtherLivePhotoSearchOptions {
+  ownerId: string;
+  livePhotoCID: string;
+  photoAssetId: string;
+  videoAssetId: string;
+  type: AssetType;
+}
+
 export interface MapMarkerSearchOptions {
   isArchived?: boolean;
   isFavorite?: boolean;
@@ -166,6 +174,7 @@ export interface IAssetRepository {
   softDeleteAll(ids: string[]): Promise<void>;
   restoreAll(ids: string[]): Promise<void>;
   findLivePhotoMatch(options: LivePhotoSearchOptions): Promise<AssetEntity | null>;
+  findOtherLivePhotoMatches(options: OtherLivePhotoSearchOptions): Promise<AssetEntity[] | null>;
   getMapMarkers(ownerIds: string[], options?: MapMarkerSearchOptions): Promise<MapMarker[]>;
   getStatistics(ownerId: string, options: AssetStatsOptions): Promise<AssetStats>;
   getTimeBuckets(options: TimeBucketOptions): Promise<TimeBucketItem[]>;
