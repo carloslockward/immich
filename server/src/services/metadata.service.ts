@@ -426,6 +426,13 @@ export class MetadataService {
             'base64',
           )} already exists in the repository`,
         );
+        let extraMotionAssets = await this.getArrayByChecksum(asset.ownerId, checksum, motionAsset.id);
+        if (extraMotionAssets) {
+          for (const to_delete of extraMotionAssets) {
+            await this.jobRepository.queue({ name: JobName.ASSET_DELETION, data: { id: to_delete.id } });
+            this.logger.log(`Removed redundant motion asset (${to_delete.id})`);
+          }
+        }
       } else {
         // We create a UUID in advance so that each extracted video can have a unique filename
         // (allowing us to delete old ones if necessary)

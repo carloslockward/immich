@@ -270,6 +270,11 @@ export class AssetRepository implements IAssetRepository {
     return this.repository.findOne({ where: { ownerId: userId, checksum } });
   }
 
+  @GenerateSql({ params: [DummyValue.UUID, DummyValue.BUFFER, DummyValue.UUID] })
+  getArrayByChecksum(userId: string, checksum: Buffer, excludeId: string): Promise<AssetEntity[] | null> {
+    return this.repository.find({ where: { id: Not(excludeId), ownerId: userId, checksum } });
+  }
+
   findLivePhotoMatch(options: LivePhotoSearchOptions): Promise<AssetEntity | null> {
     const { ownerId, otherAssetId, livePhotoCID, type } = options;
 
